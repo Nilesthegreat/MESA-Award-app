@@ -1,0 +1,166 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9f9f9;
+  color: #222;
+}
+
+a {
+  text-decoration: none;
+}
+
+header.hero {
+  background: linear-gradient(to right, #111827, #1f2937);
+  color: white;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+header.hero.small {
+  padding: 60px 20px;
+}
+
+.hero {
+  background: url('img/fcfmt.jpg') center/cover no-repeat;
+  color: white;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85); /* dark overlay */
+}
+.hero .overlay {
+  position: relative;
+  z-index: 1;
+}
+
+
+.hero h1 {
+  font-size: 3.5em;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 20px 0 10px;
+  color: #ffcc00;
+  text-shadow: 2px 2px #000;
+}
+
+.hero .tagline {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+  color: #f3f4f6;
+}
+
+
+.buttons {
+  margin-top: 30px;
+}
+
+.btn, .btn-secondary {
+  display: inline-block;
+  margin: 10px;
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.btn {
+  background-color: #ffcc00;
+  color: #111;
+}
+
+.btn-secondary {
+  background-color: #eeeeee;
+  color: #333;
+}
+
+.content {
+  padding: 40px 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.form-page {
+  padding: 40px 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+iframe {
+  width: 100%;
+  height: 1200px;
+  border: none;
+  border-radius: 10px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+@media screen and (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.2em;
+    letter-spacing: 1px;
+  }
+
+  .hero .tagline {
+    font-size: 1em;
+  }
+
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+
+  iframe {
+    height: 1500px;
+  }
+
+/* 🔵 Circle Logo Styling */
+.logo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+/* ⏳ Countdown Styling */
+.countdown {
+  background: #fff4ce;
+  color: #111;
+  padding: 20px 25px;
+  border-radius: 12px;
+  display: inline-block;
+  margin: 30px auto;
+  font-size: 1.2em;
+  font-weight: 500;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.countdown h3 {
+  margin: 0 0 10px;
+  font-size: 1.3em;
+  color: #333;
+}
+
+#timer {
+  font-size: 2em;
+  font-weight: 800;
+  color: #222;
+  letter-spacing: 1px;
+}
+
