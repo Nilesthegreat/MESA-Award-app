@@ -1,23 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vote – MESA Awards 2025</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>MESA Awards Voting</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="hero small">
-    <h1>🗳 Voting Portal</h1>
-    <p>Voting opens soon. Stay tuned!</p>
-  </header>
+  <h1>MESA Awards Voting</h1>
 
-  <main class="form-page">
-    <p>We're reviewing all nominations. Voting will begin shortly.</p>
-  </main>
+  <div id="nomineeList">
+    <p>Loading nominees...</p>
+  </div>
 
-  <footer>
-    <p><a href="index.html">← Back to Home</a></p>
-  </footer>
+  <div id="voteForm" style="display:none; margin-top: 20px;">
+    <h3 id="voteHeading">Vote Now</h3>
+    <input type="text" id="voteCodeInput" placeholder="Enter your vote code" />
+    <button id="submitVoteBtn">Submit Vote</button>
+    <p id="voteFeedback"></p>
+    <button id="cancelVoteBtn">Cancel</button>
+  </div>
+
+  <script>
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKp-U_cs1WSWz6VeRdi6-yqc0cIv-SIE3XnvIKIl5bjaf_XRD2ychBbIBa-FRctMdwUg/exec'; // ← Replace with your actual Web App URL
+
+    // Load nominees from backend
+    fetch(WEB_APP_URL + '?action=getNominees')
+      .then(res => res.json())
+      .then(nominees => {
+        const list = document.getElementById('nomineeList');
+        list.innerHTML = '';
+        nominees.forEach(n => {
+          const div = document.createElement('div');
+          div.className = 'nominee-card';
+          div.innerHTML = `
+            <h4>${n.Nominee}</h4>
+            <p><em>${n.Category}</em></p>
+            <button class="vote-btn" data-nominee="${n.Nominee}" data-category="${n.Category}">
+              Vote Now
+            </button>
+          `;
+          list.appendChild(div);
+        });
+
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            window.selectedVote = {
+              nominee: btn.dataset.nominee,
+              category: btn.dataset.category
+            };
+            document.getElementById('voteHeading').textContent = `Voting for: ${window.selectedVote.nominee}`;
+            document.getElementById('voteForm').style.display = 'block';
+            document.getElementById('voteCodeInput').value = '';
+            document.getElementById('voteFeedback').textContent = '';
+          });
+        });
+      });
+
+    // Handle form submission
+    document.getElementById('submitVoteBtn').addEventListener('click', () => {
+      const code = document.getElementById('voteCodeInput').value.trim();
+      const { nominee, category } = window.selectedVote;
+
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, nominee, category })
+      })
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('voteFeedback').textContent =
+          data.status === 'success'
+            ? '✅ Your vote has been submitted!'
+            : '❌ ' + data.message;
+      })
+      .catch(() => {
+        document.getElementById('voteFeedback').textContent = '❌ Network error.';
+      });
+    });
+
+    // Cancel button
+    document.getElementById('cancelVoteBtn').addEventListener('click', () => {
+      document.getElementById('voteForm').style.display = 'none';
+    });
+  </script>
 </body>
 </html>
