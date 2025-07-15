@@ -1,49 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>MESA Awards Voting</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      color: #222;
+    }
+
+    .hero {
+      background: linear-gradient(to right, #111827, #1f2937);
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.8em;
+      font-weight: 900;
+      color: #ffcc00;
+      text-shadow: 2px 2px #000;
+      margin: 0;
+    }
+
+    .hero .tagline {
+      font-size: 1.1em;
+      color: #f3f4f6;
+      margin-top: 10px;
+    }
+
+    .form-page {
+      max-width: 800px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    .nominee-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 15px;
+    }
+
+    .vote-btn {
+      background: #ffcc00;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      color: #111;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .vote-btn:hover {
+      background: #e6b800;
+    }
+
+    #voteForm {
+      display: none;
+      margin-top: 20px;
+      background: #fff4ce;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 280px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .btn-secondary {
+      background: #eee;
+      color: #333;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      margin-left: 10px;
+    }
+
+    #voteFeedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #999;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
-  <h1>MESA Awards Voting</h1>
 
-  <div id="nomineeList">
-    <p>Loading nominees...</p>
+  <header class="hero">
+    <h1>MESA Voting</h1>
+    <p class="tagline">Cast your vote for the stars of the moment</p>
+  </header>
+
+  <div class="form-page">
+    <div id="nomineeList">Loading nominees...</div>
+
+    <div id="voteForm">
+      <h3 id="voteHeading">Vote Now</h3>
+      <input type="text" id="voteCodeInput" placeholder="Enter your vote code" />
+      <br />
+      <button id="submitVoteBtn" class="vote-btn">Submit Vote</button>
+      <button id="cancelVoteBtn" class="btn-secondary">Cancel</button>
+      <p id="voteFeedback"></p>
+    </div>
   </div>
 
-  <div id="voteForm" style="display:none; margin-top: 20px;">
-    <h3 id="voteHeading">Vote Now</h3>
-    <input type="text" id="voteCodeInput" placeholder="Enter your vote code" />
-    <button id="submitVoteBtn">Submit Vote</button>
-    <p id="voteFeedback"></p>
-    <button id="cancelVoteBtn">Cancel</button>
-  </div>
+  <footer>© 2025 MESA Awards. Powered by You.</footer>
 
   <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKp-U_cs1WSWz6VeRdi6-yqc0cIv-SIE3XnvIKIl5bjaf_XRD2ychBbIBa-FRctMdwUg/exec'; // ← Replace with your actual Web App URL
+    const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE'; // 👈 Replace with your Google Script Web App URL
 
-    // Load nominees from backend
     fetch(WEB_APP_URL + '?action=getNominees')
       .then(res => res.json())
       .then(nominees => {
         const list = document.getElementById('nomineeList');
         list.innerHTML = '';
         nominees.forEach(n => {
-          const div = document.createElement('div');
-          div.className = 'nominee-card';
-          div.innerHTML = `
+          const card = document.createElement('div');
+          card.className = 'nominee-card';
+          card.innerHTML = `
             <h4>${n.Nominee}</h4>
             <p><em>${n.Category}</em></p>
-            <button class="vote-btn" data-nominee="${n.Nominee}" data-category="${n.Category}">
-              Vote Now
-            </button>
+            <button class="vote-btn" data-nominee="${n.Nominee}" data-category="${n.Category}">Vote Now</button>
           `;
-          list.appendChild(div);
+          list.appendChild(card);
         });
 
         document.querySelectorAll('.vote-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.onclick = () => {
             window.selectedVote = {
               nominee: btn.dataset.nominee,
               category: btn.dataset.category
@@ -52,12 +155,12 @@
             document.getElementById('voteForm').style.display = 'block';
             document.getElementById('voteCodeInput').value = '';
             document.getElementById('voteFeedback').textContent = '';
-          });
+            window.scrollTo({ top: document.getElementById('voteForm').offsetTop, behavior: 'smooth' });
+          };
         });
       });
 
-    // Handle form submission
-    document.getElementById('submitVoteBtn').addEventListener('click', () => {
+    document.getElementById('submitVoteBtn').onclick = () => {
       const code = document.getElementById('voteCodeInput').value.trim();
       const { nominee, category } = window.selectedVote;
 
@@ -76,12 +179,11 @@
       .catch(() => {
         document.getElementById('voteFeedback').textContent = '❌ Network error.';
       });
-    });
+    };
 
-    // Cancel button
-    document.getElementById('cancelVoteBtn').addEventListener('click', () => {
+    document.getElementById('cancelVoteBtn').onclick = () => {
       document.getElementById('voteForm').style.display = 'none';
-    });
+    };
   </script>
 </body>
 </html>
