@@ -140,76 +140,93 @@
 
   <footer>© 2025 MESA Awards. All Rights Reserved.</footer>
 
-  <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKp-U_cs1WSWz6VeRdi6-yqc0cIv-SIE3XnvIKIl5bjaf_XRD2ychBbIBa-FRctMdwUg/exec'; // 🔁 Replace with your deployed Apps Script Web App URL
+<script>
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKp-U_cs1WSWz6VeRdi6-yqc0cIv-SIE3XnvIKIl5bjaf_XRD2ychBbIBa-FRctMdwUg/exec';
 
-    fetch(WEB_APP_URL + '?action=getNominees')
-      .then(res => res.json())
-      .then(nominees => {
-        const grouped = {};
-        nominees.forEach(n => {
-          if (!grouped[n.Category]) grouped[n.Category] = [];
-          grouped[n.Category].push(n.Nominee);
-        });
+  fetch(WEB_APP_URL + '?action=getNominees')
+    .then(res => res.json())
+    .then(nominees => {
+      const grouped = {};
+      nominees.forEach(n => {
+        if (!grouped[n.Category]) grouped[n.Category] = [];
+        grouped[n.Category].push(n.Nominee);
+      });
 
-        const list = document.getElementById('nomineeList');
-        list.innerHTML = '';
+      const list = document.getElementById('nomineeList');
+      list.innerHTML = '';
 
-        Object.keys(grouped).forEach(category => {
-          const section = document.createElement('div');
-          section.className = 'category-section';
-          section.innerHTML = `<h2>${category}</h2>`;
-          grouped[category].forEach(nominee => {
-            const card = document.createElement('div');
-            card.className = 'nominee-card';
-            card.innerHTML = `
-              <span><strong>${nominee}</strong></span>
-              <button class="vote-btn" data-nominee="${nominee}" data-category="${category}">Vote Now</button>
-            `;
-            section.appendChild(card);
-          });
-          list.appendChild(section);
-        });
+      Object.keys(grouped).forEach(category => {
+        const section = document.createElement('div');
+        section.className = 'category-section';
 
-        document.querySelectorAll('.vote-btn').forEach(btn => {
-          btn.onclick = () => {
+        const heading = document.createElement('h2');
+        heading.textContent = category;
+        section.appendChild(heading);
+
+        grouped[category].forEach(nomineeName => {
+          const card = document.createElement('div');
+          card.className = 'nominee-card';
+
+          const nameEl = document.createElement('span');
+          nameEl.innerHTML = `<strong>${nomineeName}</strong>`;
+
+          const button = document.createElement('button');
+          button.className = 'vote-btn';
+          button.textContent = 'Vote Now';
+          button.dataset.nominee = nomineeName;
+          button.dataset.category = category;
+
+          // 🧠 On click
+          button.onclick = () => {
             window.selectedVote = {
-              nominee: btn.dataset.nominee,
-              category: btn.dataset.category
+              nominee: nomineeName,
+              category: category
             };
-            document.getElementById('voteHeading').textContent = `Voting for: ${window.selectedVote.nominee}`;
+            document.getElementById('voteHeading').textContent = `Voting for: ${nomineeName}`;
             document.getElementById('voteForm').style.display = 'block';
             document.getElementById('voteCodeInput').value = '';
             document.getElementById('voteFeedback').textContent = '';
             window.scrollTo({ top: document.getElementById('voteForm').offsetTop, behavior: 'smooth' });
           };
+
+          card.appendChild(nameEl);
+          card.appendChild(button);
+          section.appendChild(card);
         });
+
+        list.appendChild(section);
       });
+    });
 
-    document.getElementById('submitVoteBtn').onclick = () => {
-      const code = document.getElementById('voteCodeInput').value.trim();
-      const { nominee, category } = window.selectedVote;
+  document.getElementById('submitVoteBtn').onclick = () => {
+    const code = document.getElementById('voteCodeInput').value.trim();
+    const { nominee, category } = window.selectedVote || {};
 
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, nominee, category })
-      })
-      .then(r => r.json())
-      .then(data => {
-        document.getElementById('voteFeedback').textContent =
-          data.status === 'success'
-            ? '✅ Your vote has been submitted!'
-            : '❌ ' + data.message;
-      })
-      .catch(() => {
-        document.getElementById('voteFeedback').textContent = '❌ Network error.';
-      });
-    };
+    if (!nominee || !category || !code) {
+      document.getElementById('voteFeedback').textContent = '❌ Please enter your code and select a nominee.';
+      return;
+    }
 
-    document.getElementById('cancelVoteBtn').onclick = () => {
-      document.getElementById('voteForm').style.display = 'none';
-    };
-  </script>
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, nominee, category })
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('voteFeedback').textContent =
+        data.status === 'success'
+          ? '✅ Your vote has been submitted!'
+          : '❌ ' + data.message;
+    })
+    .catch(() => {
+      document.getElementById('voteFeedback').textContent = '❌ Network error.';
+    });
+  };
+
+  document.getElementById('cancelVoteBtn').onclick = () => {
+    document.getElementById('voteForm').style.display = 'none';
+  };
+</script>
 </body>
 </html>
