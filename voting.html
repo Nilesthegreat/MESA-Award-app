@@ -33,23 +33,37 @@
     }
 
     .form-page {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
-      padding: 40px 20px;
+      padding: 30px 20px;
+    }
+
+    .category-section {
+      margin-bottom: 40px;
+    }
+
+    .category-section h2 {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      color: #1f2937;
     }
 
     .nominee-card {
       background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 15px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .vote-btn {
       background: #ffcc00;
       border: none;
-      padding: 10px 16px;
+      padding: 8px 14px;
       border-radius: 6px;
       color: #111;
       font-weight: bold;
@@ -108,7 +122,7 @@
 
   <header class="hero">
     <h1>MESA Voting</h1>
-    <p class="tagline">Cast your vote for the stars of the moment</p>
+    <p class="tagline">Cast your vote by selecting your favorite nominees</p>
   </header>
 
   <div class="form-page">
@@ -124,25 +138,37 @@
     </div>
   </div>
 
-  <footer>© 2025 MESA Awards. Powered by You.</footer>
+  <footer>© 2025 MESA Awards. All Rights Reserved.</footer>
 
   <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKp-U_cs1WSWz6VeRdi6-yqc0cIv-SIE3XnvIKIl5bjaf_XRD2ychBbIBa-FRctMdwUg/exec'; // 👈 Replace with your Google Script Web App URL
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKp-U_cs1WSWz6VeRdi6-yqc0cIv-SIE3XnvIKIl5bjaf_XRD2ychBbIBa-FRctMdwUg/exec'; // 🔁 Replace with your deployed Apps Script Web App URL
 
     fetch(WEB_APP_URL + '?action=getNominees')
       .then(res => res.json())
       .then(nominees => {
+        const grouped = {};
+        nominees.forEach(n => {
+          if (!grouped[n.Category]) grouped[n.Category] = [];
+          grouped[n.Category].push(n.Nominee);
+        });
+
         const list = document.getElementById('nomineeList');
         list.innerHTML = '';
-        nominees.forEach(n => {
-          const card = document.createElement('div');
-          card.className = 'nominee-card';
-          card.innerHTML = `
-            <h4>${n.Nominee}</h4>
-            <p><em>${n.Category}</em></p>
-            <button class="vote-btn" data-nominee="${n.Nominee}" data-category="${n.Category}">Vote Now</button>
-          `;
-          list.appendChild(card);
+
+        Object.keys(grouped).forEach(category => {
+          const section = document.createElement('div');
+          section.className = 'category-section';
+          section.innerHTML = `<h2>${category}</h2>`;
+          grouped[category].forEach(nominee => {
+            const card = document.createElement('div');
+            card.className = 'nominee-card';
+            card.innerHTML = `
+              <span><strong>${nominee}</strong></span>
+              <button class="vote-btn" data-nominee="${nominee}" data-category="${category}">Vote Now</button>
+            `;
+            section.appendChild(card);
+          });
+          list.appendChild(section);
         });
 
         document.querySelectorAll('.vote-btn').forEach(btn => {
