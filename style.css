@@ -147,4 +147,42 @@ input[type="number"] {
     height: 60px;
   }
 }
+.nominee-card {
+  margin: 30px auto;
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  max-width: 600px;
+  overflow: hidden;
+  gap: 20px;
+  padding: 20px;
+}
+
+.nominee-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #ffcc00;
+  box-shadow: 0 0 6px rgba(0,0,0,0.15);
+}
+
+.nominee-info {
+  text-align: left;
+}
+
+.nominee-info h3 {
+  margin: 0 0 8px;
+  color: #111;
+  font-size: 1.4em;
+}
+
+.nominee-info p {
+  margin: 0;
+  color: #555;
+  font-size: 0.95em;
+}
+
 
