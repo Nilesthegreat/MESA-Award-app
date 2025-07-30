@@ -5,11 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vote – MESA Awards 2025</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- 🎬 Video Hero -->
+  <header class="hero-video">
+    <video autoplay muted loop id="bgVideo">
+      <source src="img/mesa-clip.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="video-overlay">
+      <img src="img/fcfmt.jpg" alt="MESA Logo" class="logo" />
+      <h1>MESA Awards 2025</h1>
+      <p class="tagline">Vote for the best of the best 🎖️</p>
+
+      <div class="buttons">
+        <a href="index.html" class="btn glassy">← Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 🗳 Voting Form -->
   <div class="form-page">
     <h1>🗳️ Cast Your Vote</h1>
-    <p>₦200 per vote. You can vote multiple times!</p>
+    <p>₦200 per vote. Vote as many times as you like!</p>
 
     <form id="voteForm">
       <label for="category">Category:</label>
@@ -23,7 +49,7 @@
       </select>
 
       <div class="vote-section">
-        <label for="voteCount">Number of Votes:</label>
+        <label for="voteCount">Votes:</label>
         <div class="vote-control">
           <button type="button" id="minusBtn">−</button>
           <input type="number" id="voteCount" value="1" min="1" max="500" readonly>
@@ -32,49 +58,42 @@
         <p>Total Amount: ₦<span id="totalAmount">200</span></p>
       </div>
 
-      <button type="submit" class="btn btn-primary">Vote & Pay</button>
+      <button id="paystackBtn" type="button">Pay & Vote</button>
     </form>
 
     <p id="status" style="margin-top: 20px;"></p>
-    <a href="index.html" class="btn btn-secondary">← Back to Home</a>
   </div>
 
+  <!-- 🧠 Paystack + App Script -->
   <script src="https://js.paystack.co/v1/inline.js"></script>
   <script>
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbznCEXVCPklmLfuA0hegX4qGKUufay8fycxOC2bZlXie153-sVJXBMjNIbh8YgRCwJ9NQ/exec';
-
-    const form = document.getElementById('voteForm');
+    const voteForm = document.getElementById('voteForm');
     const status = document.getElementById('status');
     const catSelect = document.getElementById('category');
     const nomSelect = document.getElementById('nominee');
     const voteCountEl = document.getElementById('voteCount');
     const totalAmountEl = document.getElementById('totalAmount');
-    const plusBtn = document.getElementById('plusBtn');
-    const minusBtn = document.getElementById('minusBtn');
 
-    const votePrice = 200;
-    const maxVotes = 500;
-
-    function updateAmount() {
+    function updateTotal() {
       const votes = parseInt(voteCountEl.value);
-      totalAmountEl.textContent = votes * votePrice;
+      totalAmountEl.textContent = votes * 200;
     }
 
-    plusBtn.addEventListener('click', () => {
+    document.getElementById('plusBtn').onclick = () => {
       let count = parseInt(voteCountEl.value);
-      if (count < maxVotes) {
+      if (count < 500) {
         voteCountEl.value = count + 1;
-        updateAmount();
+        updateTotal();
       }
-    });
-
-    minusBtn.addEventListener('click', () => {
+    };
+    document.getElementById('minusBtn').onclick = () => {
       let count = parseInt(voteCountEl.value);
       if (count > 1) {
         voteCountEl.value = count - 1;
-        updateAmount();
+        updateTotal();
       }
-    });
+    };
 
     function loadCategories() {
       fetch(WEB_APP_URL)
@@ -84,7 +103,6 @@
           Object.keys(data).forEach(cat => {
             catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
           });
-
           catSelect.addEventListener('change', () => {
             const nominees = data[catSelect.value] || [];
             nomSelect.innerHTML = '<option value="">-- Select Nominee --</option>';
@@ -99,29 +117,26 @@
         });
     }
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+    document.getElementById('paystackBtn').onclick = function () {
       const category = catSelect.value;
       const nominee = nomSelect.value;
       const voteCount = parseInt(voteCountEl.value);
-      const amount = voteCount * votePrice * 100; // in kobo
-
       if (!category || !nominee) {
         status.textContent = '⚠️ Please select both category and nominee.';
         return;
       }
 
-      status.textContent = 'Opening payment...';
+      const amount = voteCount * 200 * 100; // in kobo
 
-      const handler = PaystackPop.setup({
+      var handler = PaystackPop.setup({
         key: 'pk_test_69c261a7a7eb3373470566dbb8b8ed36942a131f',
         email: `mesa+${Date.now()}@mesa.com`,
         amount: amount,
         currency: 'NGN',
         ref: `vote_${Date.now()}`,
-        metadata: { category, nominee, votes: voteCount },
-        callback(response) {
-          status.textContent = 'Payment successful. Recording your vote...';
+        metadata: { category, nominee, voteCount },
+        callback: function (response) {
+          status.textContent = '✅ Payment successful. Recording your vote...';
 
           fetch(WEB_APP_URL, {
             method: 'POST',
@@ -131,10 +146,10 @@
             .then(resp => resp.json())
             .then(data => {
               status.textContent = data.status || '✅ Vote recorded!';
-              form.reset();
+              voteForm.reset();
               nomSelect.innerHTML = '<option value="">Select a category first</option>';
               voteCountEl.value = 1;
-              updateAmount();
+              updateTotal();
             })
             .catch(err => {
               console.error(err);
@@ -142,17 +157,18 @@
             });
         },
         onClose: function () {
-          status.textContent = 'Payment cancelled. Vote not completed.';
+          status.textContent = '❌ Payment cancelled.';
         }
       });
 
       handler.openIframe();
-    });
+    };
 
     window.addEventListener('DOMContentLoaded', () => {
       loadCategories();
-      updateAmount();
+      updateTotal();
     });
   </script>
+
 </body>
 </html>
