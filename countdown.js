@@ -73,4 +73,20 @@ setInterval(countdown, 1000);
   });
 
   updateAmount(); // on load
+
+nomSelect.addEventListener('change', () => {
+  const selectedOption = nomSelect.options[nomSelect.selectedIndex];
+  const selectedCat = catSelect.value;
+  const nomineeData = (data[selectedCat] || []).find(n => n.name === selectedOption.value);
+
+  if (nomineeData && nomineeData.photo) {
+    document.getElementById('nomineePhoto').src = nomineeData.photo;
+    document.getElementById('nomineeName').textContent = nomineeData.name;
+    document.getElementById('nomineeBio').textContent = nomineeData.bio || '';
+    document.getElementById('nomineeCard').style.display = 'flex';
+  } else {
+    document.getElementById('nomineeCard').style.display = 'none';
+  }
+});
+
 </script>
