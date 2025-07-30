@@ -163,4 +163,53 @@ footer {
   color: #222;
   letter-spacing: 1px;
 }
+.vote-section {
+  text-align: center;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fefefe;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 400px;
+}
 
+.vote-control {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.vote-control button {
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  border: none;
+  background: #333;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.vote-control input {
+  width: 60px;
+  font-size: 18px;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+}
+
+#paystackBtn {
+  background: #00b894;
+  color: white;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#paystackBtn:hover {
+  background: #019270;
+}
