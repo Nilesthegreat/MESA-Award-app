@@ -9,7 +9,7 @@
 <body>
   <div class="form-page">
     <h1>🗳️ Cast Your Vote</h1>
-    <p>₦200 per vote. Vote as many times as you like!</p>
+    <p>₦200 per vote. You can vote multiple times!</p>
 
     <form id="voteForm">
       <label for="category">Category:</label>
@@ -22,7 +22,17 @@
         <option value="">Select a category first</option>
       </select>
 
-      <button type="submit" class="btn btn-primary">Pay ₦200 to Vote</button>
+      <div class="vote-section">
+        <label for="voteCount">Number of Votes:</label>
+        <div class="vote-control">
+          <button type="button" id="minusBtn">−</button>
+          <input type="number" id="voteCount" value="1" min="1" max="500" readonly>
+          <button type="button" id="plusBtn">+</button>
+        </div>
+        <p>Total Amount: ₦<span id="totalAmount">200</span></p>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Vote & Pay</button>
     </form>
 
     <p id="status" style="margin-top: 20px;"></p>
@@ -37,6 +47,34 @@
     const status = document.getElementById('status');
     const catSelect = document.getElementById('category');
     const nomSelect = document.getElementById('nominee');
+    const voteCountEl = document.getElementById('voteCount');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const plusBtn = document.getElementById('plusBtn');
+    const minusBtn = document.getElementById('minusBtn');
+
+    const votePrice = 200;
+    const maxVotes = 500;
+
+    function updateAmount() {
+      const votes = parseInt(voteCountEl.value);
+      totalAmountEl.textContent = votes * votePrice;
+    }
+
+    plusBtn.addEventListener('click', () => {
+      let count = parseInt(voteCountEl.value);
+      if (count < maxVotes) {
+        voteCountEl.value = count + 1;
+        updateAmount();
+      }
+    });
+
+    minusBtn.addEventListener('click', () => {
+      let count = parseInt(voteCountEl.value);
+      if (count > 1) {
+        voteCountEl.value = count - 1;
+        updateAmount();
+      }
+    });
 
     function loadCategories() {
       fetch(WEB_APP_URL)
@@ -65,6 +103,8 @@
       e.preventDefault();
       const category = catSelect.value;
       const nominee = nomSelect.value;
+      const voteCount = parseInt(voteCountEl.value);
+      const amount = voteCount * votePrice * 100; // in kobo
 
       if (!category || !nominee) {
         status.textContent = '⚠️ Please select both category and nominee.';
@@ -76,10 +116,10 @@
       const handler = PaystackPop.setup({
         key: 'pk_test_69c261a7a7eb3373470566dbb8b8ed36942a131f',
         email: `mesa+${Date.now()}@mesa.com`,
-        amount: 20000,
+        amount: amount,
         currency: 'NGN',
         ref: `vote_${Date.now()}`,
-        metadata: { category, nominee },
+        metadata: { category, nominee, votes: voteCount },
         callback(response) {
           status.textContent = 'Payment successful. Recording your vote...';
 
@@ -93,6 +133,8 @@
               status.textContent = data.status || '✅ Vote recorded!';
               form.reset();
               nomSelect.innerHTML = '<option value="">Select a category first</option>';
+              voteCountEl.value = 1;
+              updateAmount();
             })
             .catch(err => {
               console.error(err);
@@ -107,7 +149,10 @@
       handler.openIframe();
     });
 
-    window.addEventListener('DOMContentLoaded', loadCategories);
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCategories();
+      updateAmount();
+    });
   </script>
 </body>
 </html>
