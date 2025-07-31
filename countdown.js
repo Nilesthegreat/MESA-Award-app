@@ -77,7 +77,7 @@ payBtn.addEventListener('click', () => {
       alert("✅ Payment successful! Ref: " + response.reference);
 
       // ✅ SAVE VOTE TO GOOGLE SHEET
-      fetch('https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbyrUyBXaZnKXKURn7IBWa97UpIY_m7gi-yGKlex-vUg_Eyauv9hUY3Un5qazHNf_61n1g/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
