@@ -14,29 +14,33 @@
 </head>
 <body>
 
-  <!-- 🎬 Video Hero -->
- <!-- ✅ With this (TWO logos, side-by-side) -->
-<div class="logo-wrap">
-  <img src="img/fcfmt.jpg" alt="FCFMT Logo" class="logo small-logo" />
-  <img src="img/mesalogo.jpg" alt="MESA Icon" class="logo small-logo" />
-</div>
-
-      <div class="buttons">
-        <a href="index.html" class="btn glassy">← Back to Home</a>
-      </div>
-    </div>
-  </header>
-
-  <div id="nomineeCard" style="display:none;" class="nominee-card">
-  <img id="nomineePhoto" src="" alt="Nominee" />
-  <div class="nominee-info">
-    <h3 id="nomineeName">Nominee Name</h3>
-    <p id="nomineeBio">Short bio goes here...</p>
+  <!-- 🔰 LOGOS -->
+  <div class="logo-wrap">
+    <img src="img/fcfmt.jpg" alt="FCFMT Logo" class="logo small-logo" />
+    <img src="img/mesalogo.jpg" alt="MESA Icon" class="logo small-logo" />
   </div>
-</div>
 
+  <!-- 🔙 Back -->
+  <div class="buttons">
+    <a href="index.html" class="btn glassy">← Back to Home</a>
+  </div>
 
-  <!-- 🗳 Voting Form -->
+  <!-- ⏳ Countdown -->
+  <div class="countdown">
+    <h3>⏳ Voting Countdown</h3>
+    <div id="timer">Loading timer...</div>
+  </div>
+
+  <!-- 🧑‍🎓 Nominee Preview -->
+  <div id="nomineeCard" style="display:none;" class="nominee-card">
+    <img id="nomineePhoto" src="" alt="Nominee" />
+    <div class="nominee-info">
+      <h3 id="nomineeName">Nominee Name</h3>
+      <p id="nomineeBio">Short bio goes here...</p>
+    </div>
+  </div>
+
+  <!-- 🗳️ Voting Form -->
   <div class="form-page">
     <h1>🗳️ Cast Your Vote</h1>
     <p>₦200 per vote. Vote as many times as you like!</p>
@@ -68,7 +72,9 @@
     <p id="status" style="margin-top: 20px;"></p>
   </div>
 
-  <!-- 🧠 Paystack + App Script -->
-<script src="countdown.js"></script>
+  <!-- JS -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="countdown.js"></script>
+
 </body>
 </html>
