@@ -21,7 +21,7 @@ setInterval(countdown, 1000);
 
 // ============ Voting Logic & Paystack Integration =============
 
-const WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrUyBXaZnKXKURn7IBWa97UpIY_m7gi-yGKlex-vUg_Eyauv9hUY3Un5qazHNf_61n1g/exec';
 
 const voteForm = document.getElementById('voteForm');
 const status = document.getElementById('status');
