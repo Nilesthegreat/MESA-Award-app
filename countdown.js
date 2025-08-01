@@ -22,7 +22,7 @@ setInterval(countdown, 1000);
 
 // ---------- Voting Logic & Paystack ----------
 
-const WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrC69ONGG5zfa1LEst4btLifQ-0zdO21kc32AyQSfkiBcKXHkYZI7JYk_Zvo361D5CMA/exec';
 
 const status = document.getElementById('status');
 const catSelect = document.getElementById('category');
