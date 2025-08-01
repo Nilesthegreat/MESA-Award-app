@@ -70,7 +70,7 @@ document.getElementById('paystackBtn').onclick = () => {
 
   const amount = votes * 200 * 100;
   const handler = PaystackPop.setup({
-    key: 'pk_test_...your_key...',
+    key: 'pk_test_69c261a7a7eb3373470566dbb8b8ed36942a131f',
     email: `mesa+${Date.now()}@fcfmt.edu.ng`,
     amount, currency: 'NGN',
     ref: `vote_${Date.now()}`,
