@@ -98,10 +98,10 @@ document.getElementById('paystackBtn').onclick = function () {
       status.textContent = '✅ Payment successful. Recording your vote...';
 
       fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, nominee })
-      })
+  method: 'POST',
+  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+  body: JSON.stringify({ category, nominee })
+});
         .then(res => res.json())
         .then(data => {
           status.textContent = data.status || '✅ Vote recorded!';
