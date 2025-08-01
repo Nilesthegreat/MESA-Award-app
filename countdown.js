@@ -96,7 +96,7 @@ document.getElementById('paystackBtn').onclick = function () {
     callback: function () {
       status.textContent = '✅ Payment successful. Recording your vote...';
 
-      fetch(WEB_APP_URL, {
+  fetch(WEB_APP_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'text/plain;charset=utf-8' },
   body: JSON.stringify({ category, nominee })
