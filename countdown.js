@@ -1,12 +1,12 @@
-// 📆 Countdown
+// ⏳ Countdown Timer
 const eventDate = new Date("2025-08-06T00:00:00").getTime();
-function countdown() {
-  const now = new Date().getTime();
-  const distance = eventDate - now;
-  const timerEl = document.getElementById("timer");
 
+function countdown() {
+  const timerEl = document.getElementById("timer");
   if (!timerEl) return;
 
+  const now = new Date().getTime();
+  const distance = eventDate - now;
   if (distance < 0) {
     timerEl.innerText = "✅ Voting Open!";
     return;
@@ -16,23 +16,24 @@ function countdown() {
   const hrs = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   const secs = Math.floor((distance % (1000 * 60)) / 1000);
-
   timerEl.innerText = `${days}d ${hrs}h ${mins}m ${secs}s`;
 }
 setInterval(countdown, 1000);
 
-// 🌍 Voting + Paystack Integration
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrC69ONGG5zfa1LEst4btLifQ-0zdO21kc32AyQSfkiBcKXHkYZI7JYk_Zvo361D5CMA/exec'
-const voteForm = document.getElementById('voteForm');
+// ---------- Voting Logic & Paystack ----------
+
+const WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
 const status = document.getElementById('status');
 const catSelect = document.getElementById('category');
 const nomSelect = document.getElementById('nominee');
 const voteCountEl = document.getElementById('voteCount');
 const totalAmountEl = document.getElementById('totalAmount');
+const voteForm = document.getElementById('voteForm');
 
 function updateTotal() {
   const votes = parseInt(voteCountEl.value);
-  totalAmountEl.textContent = votes * 200;
+  totalAmountEl.innerText = votes * 200;
 }
 
 document.getElementById('plusBtn').onclick = () => {
@@ -60,31 +61,31 @@ function loadCategories() {
         catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
       });
 
-      catSelect.addEventListener('change', () => {
+      catSelect.onchange = () => {
         const nominees = data[catSelect.value] || [];
         nomSelect.innerHTML = '<option value="">-- Select Nominee --</option>';
         nominees.forEach(n => {
           nomSelect.innerHTML += `<option value="${n}">${n}</option>`;
         });
-      });
+      };
     })
     .catch(err => {
-      console.error(err);
-      status.textContent = '⚠️ Failed to load categories.';
+      console.error("Error loading categories", err);
+      status.innerText = '⚠️ Failed to load categories.';
     });
 }
 
-document.getElementById('paystackBtn').onclick = function () {
-  const category = catSelect.value;
-  const nominee = nomSelect.value;
+document.getElementById('paystackBtn').onclick = () => {
+  const category = catSelect.value.trim();
+  const nominee = nomSelect.value.trim();
   const voteCount = parseInt(voteCountEl.value);
 
   if (!category || !nominee) {
-    status.textContent = '⚠️ Please select both category and nominee.';
+    status.innerText = '⚠️ Please select both category and nominee.';
     return;
   }
 
-  const amount = voteCount * 200 * 100; // Kobo
+  const amount = voteCount * 200 * 100; // in kobo
 
   const handler = PaystackPop.setup({
     key: 'pk_test_69c261a7a7eb3373470566dbb8b8ed36942a131f',
@@ -93,36 +94,35 @@ document.getElementById('paystackBtn').onclick = function () {
     currency: 'NGN',
     ref: `vote_${Date.now()}`,
     metadata: { category, nominee, voteCount },
-    callback: function () {
-      status.textContent = '✅ Payment successful. Recording your vote...';
-
-  fetch(WEB_APP_URL, {
-  method: 'POST',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify({ category, nominee })
-});
+    callback: () => {
+      status.innerText = '✅ Payment successful. Recording vote...';
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category, nominee })
+      })
         .then(res => res.json())
         .then(data => {
-          status.textContent = data.status || '✅ Vote recorded!';
+          status.innerText = data.status || '✅ Vote recorded!';
           voteForm.reset();
-          voteCountEl.value = 1;
+          voteCountEl.value = '1';
           updateTotal();
           nomSelect.innerHTML = '<option value="">-- Select Nominee --</option>';
         })
         .catch(err => {
-          console.error(err);
-          status.textContent = '❌ Error saving vote.';
+          console.error("Vote-saving error:", err);
+          status.innerText = '❌ Error saving vote.';
         });
     },
-    onClose: function () {
-      status.textContent = '❌ Payment cancelled.';
+    onClose: () => {
+      status.innerText = '❌ Payment cancelled.';
     }
   });
 
   handler.openIframe();
 };
 
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   countdown();
   loadCategories();
   updateTotal();
