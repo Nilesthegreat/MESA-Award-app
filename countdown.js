@@ -17,7 +17,7 @@ function countdown() {
 setInterval(countdown, 1000);
 
 // ----- Voting Logic -----
-const WEB_APP_URL = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrC69ONGG5zfa1LEst4btLifQ-0zdO21kc32AyQSfkiBcKXHkYZI7JYk_Zvo361D5CMA/exec';
 
 document.getElementById('paystackBtn').onclick = () => {
   const cat = document.getElementById('category').value;
