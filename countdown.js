@@ -1,124 +1,101 @@
-// ⏳ Countdown Timer
+// ----- Countdown Timer -----
 const eventDate = new Date("2025-08-06T00:00:00").getTime();
-
 function countdown() {
-  const timerEl = document.getElementById("timer");
-  if (!timerEl) return;
-
-  const now = new Date().getTime();
-  const distance = eventDate - now;
-  if (distance < 0) {
-    timerEl.innerText = "✅ Voting Open!";
+  const el = document.getElementById("timer");
+  if (!el) return;
+  const diff = eventDate - Date.now();
+  if (diff <= 0) {
+    el.innerText = "✅ Voting Open!";
     return;
   }
-
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hrs = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  const secs = Math.floor((distance % (1000 * 60)) / 1000);
-  timerEl.innerText = `${days}d ${hrs}h ${mins}m ${secs}s`;
+  const d = Math.floor(diff / (1000*60*60*24));
+  const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+  const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+  const s = Math.floor((diff % (1000*60)) / 1000);
+  el.innerText = `${d}d ${h}h ${m}m ${s}s`;
 }
 setInterval(countdown, 1000);
 
-// ---------- Voting Logic & Paystack ----------
-
+// ----- Voting Logic -----
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrC69ONGG5zfa1LEst4btLifQ-0zdO21kc32AyQSfkiBcKXHkYZI7JYk_Zvo361D5CMA/exec';
 
-const status = document.getElementById('status');
-const catSelect = document.getElementById('category');
-const nomSelect = document.getElementById('nominee');
-const voteCountEl = document.getElementById('voteCount');
-const totalAmountEl = document.getElementById('totalAmount');
-const voteForm = document.getElementById('voteForm');
-
 function updateTotal() {
-  const votes = parseInt(voteCountEl.value);
-  totalAmountEl.innerText = votes * 200;
+  const count = parseInt(document.getElementById('voteCount').value);
+  document.getElementById('totalAmount').innerText = count * 200;
 }
-
-document.getElementById('plusBtn').onclick = () => {
-  let count = parseInt(voteCountEl.value);
-  if (count < 500) {
-    voteCountEl.value = count + 1;
-    updateTotal();
-  }
-};
-
-document.getElementById('minusBtn').onclick = () => {
-  let count = parseInt(voteCountEl.value);
-  if (count > 1) {
-    voteCountEl.value = count - 1;
-    updateTotal();
-  }
-};
 
 function loadCategories() {
   fetch(WEB_APP_URL)
-    .then(res => res.json())
+    .then(r=>r.json())
     .then(data => {
-      catSelect.innerHTML = '<option value="">-- Select a Category --</option>';
+      const cs = document.getElementById('category');
+      cs.innerHTML = '<option value="">-- Select Category --</option>';
       Object.keys(data).forEach(cat => {
-        catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+        cs.innerHTML += `<option value="${cat}">${cat}</option>`;
       });
-
-      catSelect.onchange = () => {
-        const nominees = data[catSelect.value] || [];
-        nomSelect.innerHTML = '<option value="">-- Select Nominee --</option>';
-        nominees.forEach(n => {
-          nomSelect.innerHTML += `<option value="${n}">${n}</option>`;
+      cs.onchange = () => {
+        const ns = document.getElementById('nominee');
+        ns.innerHTML = '<option value="">-- Select Nominee --</option>';
+        (data[cs.value] || []).forEach(n => {
+          ns.innerHTML += `<option value="${n}">${n}</option>`;
         });
       };
     })
-    .catch(err => {
-      console.error("Error loading categories", err);
-      status.innerText = '⚠️ Failed to load categories.';
-    });
+    .catch(err => document.getElementById('status').innerText = '⚠️ Failed loading categories');
 }
 
-document.getElementById('paystackBtn').onclick = () => {
-  const category = catSelect.value.trim();
-  const nominee = nomSelect.value.trim();
-  const voteCount = parseInt(voteCountEl.value);
+document.getElementById('plusBtn').onclick = () => {
+  const el = document.getElementById('voteCount');
+  let n = parseInt(el.value);
+  if (n < 500) el.value = n + 1;
+  updateTotal();
+};
+document.getElementById('minusBtn').onclick = () => {
+  const el = document.getElementById('voteCount');
+  let n = parseInt(el.value);
+  if (n > 1) el.value = n - 1;
+  updateTotal();
+};
 
+document.getElementById('paystackBtn').onclick = () => {
+  const category = document.getElementById('category').value.trim();
+  const nominee  = document.getElementById('nominee').value.trim();
+  const votes    = parseInt(document.getElementById('voteCount').value);
+
+  const status = document.getElementById('status');
   if (!category || !nominee) {
-    status.innerText = '⚠️ Please select both category and nominee.';
+    status.innerText = '⚠️ Please select category and nominee.';
     return;
   }
 
-  const amount = voteCount * 200 * 100; // in kobo
-
+  const amount = votes * 200 * 100;
   const handler = PaystackPop.setup({
-    key: 'pk_test_69c261a7a7eb3373470566dbb8b8ed36942a131f',
+    key: 'pk_test_...your_key...',
     email: `mesa+${Date.now()}@fcfmt.edu.ng`,
-    amount,
-    currency: 'NGN',
+    amount, currency: 'NGN',
     ref: `vote_${Date.now()}`,
-    metadata: { category, nominee, voteCount },
+    metadata: { category, nominee, votes },
     callback: () => {
-      status.innerText = '✅ Payment successful. Recording vote...';
+      status.innerText = '✅ Payment success. Recording vote...';
       fetch(WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, nominee })
+        body: JSON.stringify({ category, nominee, voteCount: votes })
       })
-        .then(res => res.json())
-        .then(data => {
-          status.innerText = data.status || '✅ Vote recorded!';
-          voteForm.reset();
-          voteCountEl.value = '1';
-          updateTotal();
-          nomSelect.innerHTML = '<option value="">-- Select Nominee --</option>';
-        })
-        .catch(err => {
-          console.error("Vote-saving error:", err);
-          status.innerText = '❌ Error saving vote.';
-        });
+      .then(r=>r.json())
+      .then(json => {
+        status.innerText = json.status;
+        document.getElementById('voteForm').reset();
+        document.getElementById('voteCount').value = 1;
+        updateTotal();
+      })
+      .catch(err => {
+        console.error(err);
+        status.innerText = '❌ Error saving vote.';
+      });
     },
-    onClose: () => {
-      status.innerText = '❌ Payment cancelled.';
-    }
+    onClose: () => status.innerText = '❌ Payment cancelled.'
   });
-
   handler.openIframe();
 };
 
